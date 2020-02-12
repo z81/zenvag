@@ -1,0 +1,46 @@
+{
+  "name": "zenvag",
+  "version": "0.0.1",
+  "description": "",
+  "engines": {
+    "node": ">= 12.13"
+  },
+  "devDependencies": {
+    "@types/jest": "~24.0.25",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "~12.12.22",
+    "@types/nodemon": "^1.19.0",
+    "@types/dotenv": "^8.2.0",
+    "@typescript-eslint/eslint-plugin": "~2.14.0",
+    "@typescript-eslint/parser": "~2.14.0",
+    "eslint": "~6.8.0",
+    "eslint-config-prettier": "~6.9.0",
+    "eslint-plugin-jest": "~23.2.0",
+    "jest": "~24.9.0",
+    "nodemon": "^2.0.2",
+    "prettier": "~1.19.1",
+    "rimraf": "~3.0.0",
+    "ts-jest": "~24.2.0",
+    "tsutils": "~3.17.0",
+    "typescript": "~3.7.4"
+  },
+  "scripts": {
+    "clean": "rimraf coverage build tmp",
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -w -p tsconfig.json",
+    "watch-node": "nodemon build/src/main.js",
+    "lint": "eslint . --ext .ts",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "dotenv": "^8.2.0",
+    "fp-ts": "^2.4.4",
+    "lodash": "^4.17.15",
+    "rxjs": "^6.5.4",
+    "tslib": "~1.10.0",
+    "tsyringe": "^4.0.1"
+  }
+}
