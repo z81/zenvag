@@ -6,13 +6,15 @@
     "node": ">= 12.13"
   },
   "devDependencies": {
+    "@types/concurrently": "^5.1.0",
+    "@types/dotenv": "^8.2.0",
     "@types/jest": "~24.0.25",
     "@types/lodash": "^4.14.149",
     "@types/node": "~12.12.22",
     "@types/nodemon": "^1.19.0",
-    "@types/dotenv": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "~2.14.0",
     "@typescript-eslint/parser": "~2.14.0",
+    "concurrently": "^5.1.0",
     "eslint": "~6.8.0",
     "eslint-config-prettier": "~6.9.0",
     "eslint-plugin-jest": "~23.2.0",
@@ -28,19 +30,28 @@
     "clean": "rimraf coverage build tmp",
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json",
-    "watch-node": "nodemon build/src/main.js",
+    "run:watch": "nodemon build/main.js",
     "lint": "eslint . --ext .ts",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "dev": "concurrently \"npm run build:watch\" \"npm run run:watch\""
   },
   "license": "MIT",
   "dependencies": {
+    "@tensorflow/tfjs-node": "^1.5.2",
+    "@types/": "tensorflow/tfjs-node",
+    "@types/got": "^9.6.9",
+    "canvas": "^2.6.1",
     "discord.js": "^11.5.1",
     "dotenv": "^8.2.0",
+    "face-api.js": "^0.22.1",
     "fp-ts": "^2.4.4",
+    "got": "^10.5.5",
     "lodash": "^4.17.15",
+    "playwright": "^0.11.0",
     "rxjs": "^6.5.4",
     "tslib": "~1.10.0",
-    "tsyringe": "^4.0.1"
+    "tsyringe": "^4.0.1",
+    "unfurl.js": "^5.0.1"
   }
 }
