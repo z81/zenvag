@@ -146,7 +146,7 @@ export const face = async (client: DiscordRx, { db }: any) => {
     .subscribe(async msg => {
       const [, maskName] = msg.content.split(' ', 3);
 
-      if (maskName === 'help') {
+      if (maskName === 'help' || !MASKS.includes(maskName)) {
         return void msg.reply(`\n**Список масок:** ${MASKS.join(', ')}`);
       }
 
@@ -164,38 +164,36 @@ export const face = async (client: DiscordRx, { db }: any) => {
         drawDebugInfo(out, results);
       }
 
-      if (MASKS.includes(maskName)) {
-        const mask = await loadMask(maskName);
+      const mask = await loadMask(maskName);
 
-        results.forEach(res => {
-          const leftEye = res.landmarks.getLeftEye()[0];
-          const rightEye = res.landmarks.getRightEye().pop();
-          const maskConf = MASK_CONFIG[maskName] || MASK_CONFIG.default;
-          const angle = Math.atan((rightEye.y - leftEye.y) / (rightEye.x - leftEye.x));
+      results.forEach(res => {
+        const leftEye = res.landmarks.getLeftEye()[0];
+        const rightEye = res.landmarks.getRightEye().pop();
+        const maskConf = MASK_CONFIG[maskName] || MASK_CONFIG.default;
+        const angle = Math.atan((rightEye.y - leftEye.y) / (rightEye.x - leftEye.x));
 
-          const xPoints = res.landmarks.positions.map(v => v.x);
-          const yPoints = res.landmarks.positions.map(v => v.y);
-          const minX = Math.min(...xPoints);
-          const maxX = Math.max(...xPoints);
-          const minY = Math.min(...yPoints);
-          const maxY = Math.max(...yPoints);
+        const xPoints = res.landmarks.positions.map(v => v.x);
+        const yPoints = res.landmarks.positions.map(v => v.y);
+        const minX = Math.min(...xPoints);
+        const maxX = Math.max(...xPoints);
+        const minY = Math.min(...yPoints);
+        const maxY = Math.max(...yPoints);
 
-          const x = minX + (maxX - minX) * maskConf.x;
-          const y = minY + (maxY - minY) * maskConf.y;
-          const width = (maxX - minX) * maskConf.width;
-          const height = (maxY - minY) * maskConf.height;
+        const x = minX + (maxX - minX) * maskConf.x;
+        const y = minY + (maxY - minY) * maskConf.y;
+        const width = (maxX - minX) * maskConf.width;
+        const height = (maxY - minY) * maskConf.height;
 
-          drawImage({
-            ctx,
-            x,
-            y,
-            width,
-            height,
-            angle,
-            image: mask as any,
-          });
+        drawImage({
+          ctx,
+          x,
+          y,
+          width,
+          height,
+          angle,
+          image: mask as any,
         });
-      }
+      });
 
       msg.reply('', {
         file: (out as any).toBuffer('image/jpeg'),
