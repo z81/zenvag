@@ -36,11 +36,29 @@ const MASK_CONFIG = {
     width: 1.2,
     height: 2.6,
   },
+  zai: {
+    x: -0.5,
+    y: -0.85,
+    width: 2,
+    height: 2.6,
+  },
+  obeme: {
+    x: -0.15,
+    y: -0.6,
+    width: 1.4,
+    height: 2,
+  },
   gasmask: {
     x: -0.1,
     y: -0.7,
     width: 1.2,
     height: 2.6,
+  },
+  hockey: {
+    x: -0.25,
+    y: -0.65,
+    width: 1.4,
+    height: 2,
   },
   batman: {
     x: -0.1,
@@ -53,6 +71,18 @@ const MASK_CONFIG = {
     y: -0.7,
     width: 1.2,
     height: 1.8,
+  },
+  cats: {
+    x: -0.1,
+    y: -0.9,
+    width: 1.4,
+    height: 1.8,
+  },
+  dog: {
+    x: -0.15,
+    y: -0.9,
+    width: 1.4,
+    height: 2.8,
   },
   deadface: {
     x: -0.9,
