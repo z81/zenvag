@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "engines": {
-    "node": ">= 12.13"
+    "node": ">= 9"
   },
   "devDependencies": {
     "@types/concurrently": "^5.1.0",

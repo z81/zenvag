@@ -83,12 +83,6 @@ export const MASK_CONFIG = {
     width: 1.4,
     height: 2.8,
   },
-  deadface: {
-    x: -0.9,
-    y: -0.4,
-    width: 0.6,
-    height: 1.5,
-  },
   fbi: {
     x: -0.2,
     y: -1.1,

@@ -1,71 +1,25 @@
+import { makePreview } from './make-preview';
 import { iStartWith, skipBots } from '../../adapters/discord/operators';
-import { DiscordRx } from 'adapters/discord/discordRx';
-import '@tensorflow/tfjs-node';
-import * as faceapi from 'face-api.js';
-import { WithFaceLandmarks, SsdMobilenetv1Options, FaceDetection, FaceLandmarks68, nets, draw } from 'face-api.js';
-import * as canvas from 'canvas';
-import * as fs from 'fs';
-import * as path from 'path';
+import { DiscordRx } from '../../adapters/discord/discordRx';
 import * as url from 'url';
 import got from 'got';
-import { MASK_CONFIG } from './maskConfig';
+import * as canvas from 'canvas';
+import { MASKS, drawMask, WEIGHTS_PATH } from './drawMask';
+import { MASK_CONFIG } from '../../actions/face/maskConfig';
+import { nets } from 'face-api.js';
 
-const BASE_DIR = process.env.MASKS_PATH;
-const WEIGHTS_PATH = path.join(BASE_DIR, 'weights');
-const MASKS_PATH = path.join(BASE_DIR, 'masks');
-const MASKS = fs
-  .readdirSync(MASKS_PATH)
-  .map(fileName => path.parse(fileName).name)
-  .filter(m => m[0] !== '.');
+const downloadImage = async (url: string) => {
+  const imgBuffer = await got(url).buffer();
+  const img = await canvas.loadImage(imgBuffer);
+  return img;
+};
 
-const { Canvas, Image, ImageData } = canvas;
-faceapi.env.monkeyPatch({ Canvas, Image, ImageData } as any);
-
-const faceDetectionOptions = new SsdMobilenetv1Options({ minConfidence: 0.5 });
-
-type FaceParseResultType = WithFaceLandmarks<{ detection: FaceDetection }, FaceLandmarks68>;
-
-export const face = async (client: DiscordRx, { db }: any) => {
+export const face = async (client: DiscordRx) => {
   await nets.ssdMobilenetv1.loadFromDisk(WEIGHTS_PATH);
   await nets.faceLandmark68Net.loadFromDisk(WEIGHTS_PATH);
 
-  const downloadImage = async (url: string) => {
-    const imgBuffer = await got(url).buffer();
-    const img = await canvas.loadImage(imgBuffer);
-    return img;
-  };
-
-  const detectFaces = (img: faceapi.TNetInput) => faceapi.detectAllFaces(img, faceDetectionOptions).withFaceLandmarks();
-
-  const drawDebugInfo = (out: HTMLCanvasElement, results: FaceParseResultType[]) => {
-    draw.drawFaceLandmarks(
-      out,
-      results.map(res => res.landmarks),
-    );
-    draw.drawDetections(
-      out,
-      results.map(res => res.detection),
-    );
-  };
-
-  const loadMask = (maskName: string) => canvas.loadImage(path.join(MASKS_PATH, `${maskName}.png`));
-
-  type DrawImageArgs = {
-    ctx: CanvasRenderingContext2D;
-    x: number;
-    y: number;
-    angle: number;
-    height: number;
-    width: number;
-    image: CanvasImageSource;
-  };
-  const drawImage = ({ ctx, x, y, angle, width, height, image }: DrawImageArgs) => {
-    ctx.save();
-    ctx.translate(x + width / 2, y + height / 2);
-    ctx.rotate(angle);
-    ctx.drawImage(image, -width / 2, -height / 2, width, height);
-    ctx.restore();
-  };
+  const preview = await makePreview();
+  const previewImage = preview.toBuffer('image/jpeg');
 
   client
     .flow('message')
@@ -74,7 +28,9 @@ export const face = async (client: DiscordRx, { db }: any) => {
       const [, maskName, imgUrl] = msg.content.split(' ', 3);
 
       if (maskName === 'help' || !MASKS.includes(maskName)) {
-        return void msg.reply(`\n**Список масок:** ${MASKS.join(', ')}`);
+        return void msg.reply('face **НАЗВАНИЕ_МАСКИ** @ник/изображение/ссылка на изображение/или ничего', {
+          file: previewImage as any,
+        });
       }
 
       const maskUrl =
@@ -84,44 +40,7 @@ export const face = async (client: DiscordRx, { db }: any) => {
         msg.author.avatarURL;
 
       const img = await downloadImage(maskUrl);
-      const results = await detectFaces(img as any);
-      const out = faceapi.createCanvasFromMedia(img as any);
-      const ctx = out.getContext('2d');
-
-      const mask = await loadMask(maskName);
-
-      results.forEach(res => {
-        const leftEye = res.landmarks.getLeftEye()[0];
-        const rightEye = res.landmarks.getRightEye().pop();
-        const maskConf = MASK_CONFIG[maskName as keyof typeof MASK_CONFIG] || MASK_CONFIG.default;
-        const angle = Math.atan((rightEye.y - leftEye.y) / (rightEye.x - leftEye.x));
-
-        const xPoints = res.landmarks.positions.map(v => v.x);
-        const yPoints = res.landmarks.positions.map(v => v.y);
-        const minX = Math.min(...xPoints);
-        const maxX = Math.max(...xPoints);
-        const minY = Math.min(...yPoints);
-        const maxY = Math.max(...yPoints);
-
-        const x = minX + (maxX - minX) * maskConf.x;
-        const y = minY + (maxY - minY) * maskConf.y;
-        const width = (maxX - minX) * maskConf.width;
-        const height = (maxY - minY) * maskConf.height;
-
-        drawImage({
-          ctx,
-          x,
-          y,
-          width,
-          height,
-          angle,
-          image: mask as any,
-        });
-
-        if (process.env.NODE_ENV === 'development') {
-          drawDebugInfo(out, results);
-        }
-      });
+      const out = await drawMask(maskName as keyof typeof MASK_CONFIG, img);
 
       msg.reply('', {
         file: (out as any).toBuffer('image/jpeg'),
