@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
 import got from 'got';
+import { MASK_CONFIG } from './maskConfig';
 
 const BASE_DIR = process.env.MASKS_PATH;
 const WEIGHTS_PATH = path.join(BASE_DIR, 'weights');
@@ -23,111 +24,6 @@ faceapi.env.monkeyPatch({ Canvas, Image, ImageData } as any);
 const faceDetectionOptions = new SsdMobilenetv1Options({ minConfidence: 0.5 });
 
 type FaceParseResultType = WithFaceLandmarks<{ detection: FaceDetection }, FaceLandmarks68>;
-
-const MASK_CONFIG = {
-  default: {
-    x: 1,
-    y: 1,
-    width: 1,
-    height: 1,
-  },
-  bandit: {
-    x: -0.1,
-    y: -0.7,
-    width: 1.2,
-    height: 2.6,
-  },
-  zai: {
-    x: -0.5,
-    y: -0.85,
-    width: 2,
-    height: 2.6,
-  },
-  obeme: {
-    x: -0.15,
-    y: -0.6,
-    width: 1.4,
-    height: 2,
-  },
-  gasmask: {
-    x: -0.1,
-    y: -0.7,
-    width: 1.2,
-    height: 2.6,
-  },
-  hockey: {
-    x: -0.25,
-    y: -0.65,
-    width: 1.4,
-    height: 2,
-  },
-  batman: {
-    x: -0.1,
-    y: -0.8,
-    width: 1.2,
-    height: 1.5,
-  },
-  cat: {
-    x: -0.1,
-    y: -0.7,
-    width: 1.2,
-    height: 1.8,
-  },
-  cats: {
-    x: -0.1,
-    y: -0.9,
-    width: 1.4,
-    height: 1.8,
-  },
-  dog: {
-    x: -0.15,
-    y: -0.9,
-    width: 1.4,
-    height: 2.8,
-  },
-  deadface: {
-    x: -0.9,
-    y: -0.4,
-    width: 0.6,
-    height: 1.5,
-  },
-  fbi: {
-    x: -0.2,
-    y: -1.1,
-    width: 1.4,
-    height: 1.5,
-  },
-  anon: {
-    x: -0.4,
-    y: -0.5,
-    width: 1.8,
-    height: 2,
-  },
-  hair: {
-    x: -0.1,
-    y: -0.55,
-    width: 1.2,
-    height: 1.6,
-  },
-  js: {
-    x: -0.1,
-    y: -0.9,
-    width: 1.2,
-    height: 1.1,
-  },
-  santa: {
-    x: -0.1,
-    y: -0.9,
-    width: 1.65,
-    height: 1.1,
-  },
-  mustache: {
-    x: 0.05,
-    y: 0.5,
-    width: 0.9,
-    height: 0.6,
-  },
-};
 
 export const face = async (client: DiscordRx, { db }: any) => {
   await nets.ssdMobilenetv1.loadFromDisk(WEIGHTS_PATH);
@@ -192,16 +88,12 @@ export const face = async (client: DiscordRx, { db }: any) => {
       const out = faceapi.createCanvasFromMedia(img as any);
       const ctx = out.getContext('2d');
 
-      if (process.env.NODE_ENV === 'development') {
-        drawDebugInfo(out, results);
-      }
-
       const mask = await loadMask(maskName);
 
       results.forEach(res => {
         const leftEye = res.landmarks.getLeftEye()[0];
         const rightEye = res.landmarks.getRightEye().pop();
-        const maskConf = MASK_CONFIG[maskName] || MASK_CONFIG.default;
+        const maskConf = MASK_CONFIG[maskName as keyof typeof MASK_CONFIG] || MASK_CONFIG.default;
         const angle = Math.atan((rightEye.y - leftEye.y) / (rightEye.x - leftEye.x));
 
         const xPoints = res.landmarks.positions.map(v => v.x);
@@ -225,6 +117,10 @@ export const face = async (client: DiscordRx, { db }: any) => {
           angle,
           image: mask as any,
         });
+
+        if (process.env.NODE_ENV === 'development') {
+          drawDebugInfo(out, results);
+        }
       });
 
       msg.reply('', {

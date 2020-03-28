@@ -14,7 +14,6 @@ client
 
 const env = {
   get db() {
-    console.log('test');
     return 'test';
   },
 };
