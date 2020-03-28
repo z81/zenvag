@@ -34,7 +34,7 @@ export const face = async (client: DiscordRx) => {
       }
 
       const maskUrl =
-        (url.parse(imgUrl) && imgUrl) ||
+        (imgUrl && url.parse(imgUrl) && imgUrl) ||
         (msg.attachments.size > 0 && msg.attachments.first().url) ||
         (msg.mentions.users.size > 0 && msg.mentions.users.first().avatarURL) ||
         msg.author.avatarURL;
