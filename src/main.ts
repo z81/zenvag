@@ -14,8 +14,8 @@ client
 
 const env = {
   get db() {
-    console.log('abc');
-    return 'sas';
+    console.log('test');
+    return 'test';
   },
 };
 

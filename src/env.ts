@@ -1,3 +1,3 @@
 export const env = {
-  db: 'sas',
+  db: 'test',
 };

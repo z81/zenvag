@@ -39,7 +39,6 @@
   "license": "MIT",
   "dependencies": {
     "@tensorflow/tfjs-node": "^1.5.2",
-    "@types/": "tensorflow/tfjs-node",
     "@types/got": "^9.6.9",
     "canvas": "^2.6.1",
     "discord.js": "^11.5.1",

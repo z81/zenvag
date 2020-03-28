@@ -6,6 +6,7 @@ import { WithFaceLandmarks, SsdMobilenetv1Options, FaceDetection, FaceLandmarks6
 import * as canvas from 'canvas';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as url from 'url';
 import got from 'got';
 
 const BASE_DIR = process.env.MASKS_PATH;
@@ -174,18 +175,19 @@ export const face = async (client: DiscordRx, { db }: any) => {
     .flow('message')
     .pipe(skipBots(), iStartWith('face'))
     .subscribe(async msg => {
-      const [, maskName] = msg.content.split(' ', 3);
+      const [, maskName, imgUrl] = msg.content.split(' ', 3);
 
       if (maskName === 'help' || !MASKS.includes(maskName)) {
         return void msg.reply(`\n**Список масок:** ${MASKS.join(', ')}`);
       }
 
-      const url =
+      const maskUrl =
+        (url.parse(imgUrl) && imgUrl) ||
         (msg.attachments.size > 0 && msg.attachments.first().url) ||
         (msg.mentions.users.size > 0 && msg.mentions.users.first().avatarURL) ||
         msg.author.avatarURL;
 
-      const img = await downloadImage(url);
+      const img = await downloadImage(maskUrl);
       const results = await detectFaces(img as any);
       const out = faceapi.createCanvasFromMedia(img as any);
       const ctx = out.getContext('2d');
