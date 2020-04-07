@@ -30,6 +30,7 @@ export const radio = (client: DiscordRx, { db }: any) => {
     const updateInfo = async () => {
       thisTrackRequest = got.get(getTrackNameUrl(genre)).json<TrackInfo>();
       thisTrack = await thisTrackRequest;
+      thisTrackRequest = undefined;
 
       client.user.setActivity(`${thisTrack.artist} - ${thisTrack.title}`, { type: 'PLAYING' });
     };
