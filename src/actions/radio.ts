@@ -1,6 +1,6 @@
 import { iStartWith, skipBots } from '../adapters/discord/operators';
 import { DiscordRx } from 'adapters/discord/discordRx';
-import got from 'got';
+import got, { CancelableRequest } from 'got';
 import { VoiceChannel } from 'discord.js';
 
 const getStreamUrl = (name: string, quality = 320) => `http://air2.radiorecord.ru:9003/${name}_${quality}`;
@@ -20,11 +20,16 @@ export const radio = (client: DiscordRx, { db }: any) => {
 
   let thisTrack: TrackInfo;
   let statusUpdaterTimer: number;
+  let thisTrackRequest: CancelableRequest<TrackInfo>;
   const runStatusUpdater = (genre: string) => {
     clearInterval(statusUpdaterTimer);
+    if (thisTrackRequest) {
+      thisTrackRequest.cancel();
+    }
 
     const updateInfo = async () => {
-      thisTrack = await got.get(getTrackNameUrl(genre)).json<TrackInfo>();
+      thisTrackRequest = got.get(getTrackNameUrl(genre)).json<TrackInfo>();
+      thisTrack = await thisTrackRequest;
 
       client.user.setActivity(`${thisTrack.artist} - ${thisTrack.title}`, { type: 'PLAYING' });
     };
