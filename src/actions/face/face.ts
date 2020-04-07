@@ -6,8 +6,6 @@ import { MASKS, drawMask, WEIGHTS_PATH } from './drawMask';
 import { MASK_CONFIG } from './maskConfig';
 import { nets } from 'face-api.js';
 
-const downloadImage = async (url: string) => await canvas.loadImage(url);
-
 export const face = async (client: DiscordRx) => {
   await nets.ssdMobilenetv1.loadFromDisk(WEIGHTS_PATH);
   await nets.faceLandmark68Net.loadFromDisk(WEIGHTS_PATH);
@@ -33,7 +31,7 @@ export const face = async (client: DiscordRx) => {
         (msg.mentions.users.size > 0 && msg.mentions.users.first().avatarURL) ||
         msg.author.avatarURL;
 
-      const img = await downloadImage(maskUrl);
+      const img = await canvas.loadImage(maskUrl);
       const out = await drawMask(maskName as keyof typeof MASK_CONFIG, img);
 
       msg.reply('', {
