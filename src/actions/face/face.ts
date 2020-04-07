@@ -1,18 +1,10 @@
 import { makePreview } from './make-preview';
 import { iStartWith, skipBots } from '../../adapters/discord/operators';
 import { DiscordRx } from '../../adapters/discord/discordRx';
-import * as url from 'url';
-import got from 'got';
 import * as canvas from 'canvas';
 import { MASKS, drawMask, WEIGHTS_PATH } from './drawMask';
-import { MASK_CONFIG } from '../../actions/face/maskConfig';
+import { MASK_CONFIG } from './maskConfig';
 import { nets } from 'face-api.js';
-
-const downloadImage = async (url: string) => {
-  const imgBuffer = await got(url).buffer();
-  const img = await canvas.loadImage(imgBuffer);
-  return img;
-};
 
 export const face = async (client: DiscordRx) => {
   await nets.ssdMobilenetv1.loadFromDisk(WEIGHTS_PATH);
@@ -39,7 +31,7 @@ export const face = async (client: DiscordRx) => {
         (msg.mentions.users.size > 0 && msg.mentions.users.first().avatarURL) ||
         msg.author.avatarURL;
 
-      const img = await downloadImage(maskUrl);
+      const img = await canvas.loadImage(maskUrl);
       const out = await drawMask(maskName as keyof typeof MASK_CONFIG, img);
 
       msg.reply('', {
