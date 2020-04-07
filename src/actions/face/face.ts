@@ -1,18 +1,12 @@
 import { makePreview } from './make-preview';
 import { iStartWith, skipBots } from '../../adapters/discord/operators';
 import { DiscordRx } from '../../adapters/discord/discordRx';
-import * as url from 'url';
-import got from 'got';
 import * as canvas from 'canvas';
 import { MASKS, drawMask, WEIGHTS_PATH } from './drawMask';
-import { MASK_CONFIG } from '../../actions/face/maskConfig';
+import { MASK_CONFIG } from './maskConfig';
 import { nets } from 'face-api.js';
 
-const downloadImage = async (url: string) => {
-  const imgBuffer = await got(url).buffer();
-  const img = await canvas.loadImage(imgBuffer);
-  return img;
-};
+const downloadImage = async (url: string) => await canvas.loadImage(url);
 
 export const face = async (client: DiscordRx) => {
   await nets.ssdMobilenetv1.loadFromDisk(WEIGHTS_PATH);
