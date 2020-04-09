@@ -28,11 +28,15 @@ export const radio = (client: DiscordRx, { db }: any) => {
     }
 
     const updateInfo = async () => {
-      thisTrackRequest = got.get(getTrackNameUrl(genre)).json<TrackInfo>();
-      thisTrack = await thisTrackRequest;
-      thisTrackRequest = undefined;
+      try {
+        thisTrackRequest = got.get(getTrackNameUrl(genre)).json<TrackInfo>();
+        thisTrack = await thisTrackRequest;
+        thisTrackRequest = undefined;
 
-      client.user.setActivity(`${thisTrack.artist} - ${thisTrack.title}`, { type: 'PLAYING' });
+        await client.user.setActivity(`${thisTrack.artist} - ${thisTrack.title}`, { type: 'LISTENING' });
+      } catch (e) {
+        console.error(e);
+      }
     };
 
     statusUpdaterTimer = +setInterval(updateInfo, 5000);
