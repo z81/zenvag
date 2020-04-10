@@ -1,4 +1,4 @@
-import { makePreview } from './make-preview';
+import { makePreview } from './makePreview';
 import { iStartWith, skipBots } from '../../adapters/discord/operators';
 import { DiscordRx } from '../../adapters/discord/discordRx';
 import * as canvas from 'canvas';

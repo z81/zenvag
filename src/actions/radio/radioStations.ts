@@ -1,4 +1,4 @@
-export const radiostantions = [
+export const radioStations = [
   'rr',
   'deep',
   'rv',
