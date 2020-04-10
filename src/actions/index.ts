@@ -1,2 +1,2 @@
 export * from './face/face';
-export * from './radio';
+export * from './radio/radio';

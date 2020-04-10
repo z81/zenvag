@@ -1,14 +1,12 @@
-import { iStartWith, skipBots } from '../adapters/discord/operators';
+import { iStartWith, skipBots } from 'adapters/discord/operators';
 import { DiscordRx } from 'adapters/discord/discordRx';
 import got, { CancelableRequest } from 'got';
 import { VoiceChannel } from 'discord.js';
+import { radiostantions } from 'actions/radio/radiostantions';
 
 const getStreamUrl = (name: string, quality = 320) => `http://air2.radiorecord.ru:9003/${name}_${quality}`;
 
 const getTrackNameUrl = (name: string) => `https://www.radiorecord.ru/xml/${name}_online_v8.txt`;
-
-// prettier-ignore
-const genres = ["rr", "deep", "rv", "deti", "trancehits", "2step", "tecktonik", "neurofunk", "edmhits", "houseclss", "uplift", "darkside", "dream", "bighits", "househits", "synth", "progr", "jackin", "mt", "elect", "mf", "ibiza", "gold", "russianhits", "groovetribal", "complextro", "1970", "chillhouse", "1980", "cadillac", "rapclassics", "rap", "discofunk", "technopop", "eurodance", "russiangold", "drumhits", "liquidfunk", "jungle", "mix", "club", "trop", "goa", "fut", "tm", "chil", "mini", "ps", "rus", "vip", "hypno", "trancehouse", "mmbt", "sd90", "brks", "dub", "dc", "fbass", "rmx", "techno", "hbass", "teo", "trap", "pump", "rock", "mdl", "symph", "gop", "yo", "rave", "gast", "ansh", "naft"]
 
 type TrackInfo = { artist: string; title: string };
 
@@ -57,11 +55,11 @@ export const radio = (client: DiscordRx) => {
 
       switch (cmd) {
         case 'play':
-          if (genres.includes(name)) {
+          if (radiostantions.includes(name)) {
             runStatusUpdater(name);
             return void play(name, msg.member.voiceChannel);
           } else {
-            return void msg.reply(`Неизвестное название радио! \nСписок всех: ${genres.join(', ')}`);
+            return void msg.reply(`Неизвестное название радио! \nСписок всех: ${radiostantions.join(', ')}`);
           }
         case 'dc':
           return stopPlaying(msg.member.voiceChannel);

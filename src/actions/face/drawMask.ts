@@ -1,7 +1,7 @@
 import '@tensorflow/tfjs-node';
 import * as faceapi from 'face-api.js';
-import { WithFaceLandmarks, SsdMobilenetv1Options, FaceDetection, FaceLandmarks68, nets, draw } from 'face-api.js';
-import * as canvas from 'canvas';
+import { WithFaceLandmarks, SsdMobilenetv1Options, FaceDetection, FaceLandmarks68, draw } from 'face-api.js';
+import canvas, { Canvas, Image, ImageData } from 'canvas';
 import * as fs from 'fs';
 import * as path from 'path';
 import { MASK_CONFIG } from './maskConfig';
@@ -13,8 +13,6 @@ export const MASKS = fs
   .readdirSync(MASKS_PATH)
   .map(fileName => path.parse(fileName).name)
   .filter(m => m[0] !== '.');
-
-const { Canvas, Image, ImageData } = canvas;
 
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData } as any);
 
@@ -87,7 +85,7 @@ export const drawMask = async (maskName: keyof typeof MASK_CONFIG, img: canvas.I
       width,
       height,
       angle,
-      image: mask as any,
+      image: (mask as unknown) as CanvasImageSource,
     });
 
     if (process.env.NODE_ENV === 'development') {
