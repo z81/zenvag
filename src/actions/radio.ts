@@ -12,7 +12,7 @@ const genres = ["rr", "deep", "rv", "deti", "trancehits", "2step", "tecktonik", 
 
 type TrackInfo = { artist: string; title: string };
 
-export const radio = (client: DiscordRx, { db }: any) => {
+export const radio = (client: DiscordRx) => {
   const play = async (name: string, channel: VoiceChannel) => {
     const connection = await channel.join();
     connection.playArbitraryInput(getStreamUrl(name));

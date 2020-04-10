@@ -12,12 +12,6 @@ client
     console.log('ready');
   });
 
-const env = {
-  get db() {
-    return 'test';
-  },
-};
-
-initActions(client, env);
+initActions(client);
 
 client.login(DISCORD_TOKEN);
