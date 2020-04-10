@@ -39,9 +39,12 @@ export const radio = (client: DiscordRx) => {
   };
 
   const sendTrackInfo = (msg: Message) => {
+    if (!thisTrack.has(msg.guild.id)) {
+      msg.reply(`Сейчас ничего не играет`);
+    }
+
     const trackInfo = thisTrack.get(msg.guild.id);
-    const trackName =
-      !trackInfo || trackInfo.artist === '' ? 'Неизвестный исполнитель' : `${trackInfo.artist} - ${trackInfo.title}`;
+    const trackName = trackInfo.artist === '' ? 'Неизвестный исполнитель' : `${trackInfo.artist} - ${trackInfo.title}`;
     msg.reply(`Сейчас играет: ${trackName}`);
   };
 
@@ -64,11 +67,7 @@ export const radio = (client: DiscordRx) => {
         case 'help':
           return void msg.reply(radioCommands);
         case 'info':
-          if (!thisTrack) {
-            return void msg.reply(`Сейчас ничего не играет`);
-          } else {
-            return void sendTrackInfo(msg);
-          }
+          return void sendTrackInfo(msg);
       }
     });
 };
