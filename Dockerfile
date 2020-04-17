@@ -31,4 +31,4 @@ ADD . /app
 RUN yarn
 RUN yarn build
 
-CMD ["/app/build/main.js"]
+CMD ["node", "/app/build/main.js"]
