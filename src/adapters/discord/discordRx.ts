@@ -18,21 +18,18 @@ import {
 } from 'discord.js';
 import { Subject, Observable } from 'rxjs';
 import { memoize } from 'lodash';
-import { share } from 'rxjs/operators';
 
 export class DiscordRx extends Client {
   protected eventSubjects = new Set();
 
   protected fromEvent = memoize(<A, T extends A[]>(eventName: string) => {
     const source = new Subject<T | A>();
-    const observer = source.pipe(share());
-
     const handler = (...args: T): void => void source.next(args.length === 1 ? args[0] : args);
 
     this.on(eventName, handler);
-    observer.subscribe(null, null, () => void this.off(eventName, handler));
+    source.subscribe(null, null, () => void this.off(eventName, handler));
 
-    return observer;
+    return source;
   });
 
   public flow(event: 'channelCreate'): Observable<Channel>;
