@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zenvag
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zenvag
+  template:
+    metadata:
+      labels:
+        app: zenvag
+    spec:
+      containers:
+        - image: registry.github.com/z81/zenvag:latest
+          name: zenvag
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "3.5"
+            limits:
+              memory: "2Gi"
+              cpu: "3.5"
+      imagePullSecrets:
+        - name: zenvag_secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zenvag
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: "zenvag"
+      port: 8080
+  selector:
+    app: zenvag
