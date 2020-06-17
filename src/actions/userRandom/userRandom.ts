@@ -38,6 +38,7 @@ export const userRandom = async (client: DiscordRx) => {
           userMessages.push(
             ...messages
               .array()
+              .filter(msg => msg.author.id === RANDOM_USER_ID)
               .map(msg => msg.content)
               .filter(msg => !!msg),
           );
