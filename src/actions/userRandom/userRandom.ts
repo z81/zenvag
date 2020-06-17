@@ -9,13 +9,16 @@ export const userRandom = async (client: DiscordRx) => {
   const { RANDOM_USER_ID } = process.env;
   const CACHE_FILE = path.join(os.tmpdir(), `${RANDOM_USER_ID}.json`);
 
+  const filterMessages = (messages: string[]) =>
+    messages.map(msg => msg.replace(/<@!?(\d*)>/, '')).filter(msg => !msg.startsWith('.'));
+
   const isCacheExists = await promisify(fs.exists)(CACHE_FILE);
   const userMessages: string[] = [];
 
   if (isCacheExists) {
     console.log('Cache file exists ' + CACHE_FILE);
     const cacheData = await promisify(fs.readFile)(CACHE_FILE, 'utf-8');
-    userMessages.push(...JSON.parse(cacheData));
+    userMessages.push(...filterMessages(JSON.parse(cacheData)));
   }
 
   const getRandomTime = () => (Math.floor(Math.random() * 120) + 1) * 60000;
@@ -63,9 +66,6 @@ export const userRandom = async (client: DiscordRx) => {
         randomTimer();
       }
 
-      const msgText = userMessages[Math.floor(Math.random() * userMessages.length)];
-
-      console.log(msgText);
-      msg.channel.send(msgText);
+      msg.channel.send([1, 1, 1, 1, 1].map(() => randomMessage()).join('\n'));
     });
 };
